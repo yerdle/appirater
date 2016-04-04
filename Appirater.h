@@ -54,14 +54,14 @@ extern NSString *const kAppiraterReminderRequestDate;
 /*!
  Your app's name.
  */
-#define APPIRATER_APP_NAME				APPIRATER_LOCALIZED_APP_NAME ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"] ?: [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"]
+#define APPIRATER_APP_NAME				APPIRATER_LOCALIZED_APP_NAME ? APPIRATER_LOCALIZED_APP_NAME : [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleDisplayName"]
 
 /*!
  This is the message your users will see once they've passed the day+launches
  threshold.
  */
-#define APPIRATER_LOCALIZED_MESSAGE     NSLocalizedStringFromTableInBundle(@"If you enjoy using %@, would you mind taking a moment to rate it? It won't take more than a minute. Thanks for your support!", @"AppiraterLocalizable", [Appirater bundle], nil)
-#define APPIRATER_MESSAGE				[NSString stringWithFormat:APPIRATER_LOCALIZED_MESSAGE, APPIRATER_APP_NAME]
+#define APPIRATER_LOCALIZED_MESSAGE     @"Help us build a powerful sharing community by rating our app.\nIt will only take a minute.\nThanks for your support!"
+#define APPIRATER_MESSAGE				APPIRATER_LOCALIZED_MESSAGE
 
 /*!
  This is the title of the message alert that users will see.
@@ -144,25 +144,14 @@ extern NSString *const kAppiraterReminderRequestDate;
 + (void)userDidSignificantEvent:(BOOL)canPromptForRating;
 
 /*!
- Tells Appirater to try and show the prompt (a rating alert). The prompt will be showed
+ Tells Appirater to show the prompt (a rating alert). The prompt will be showed
  if there is connection available, the user hasn't declined to rate
  or hasn't rated current version.
  
  You could call to show the prompt regardless Appirater settings,
  e.g., in case of some special event in your app.
  */
-+ (void)tryToShowPrompt;
-
-/*!
- Tells Appirater to show the prompt (a rating alert).
- Similar to tryToShowPrompt, but without checks (the prompt is always displayed).
- Passing false will hide the rate later button on the prompt.
-  
- The only case where you should call this is if your app has an
- explicit "Rate this app" command somewhere. This is similar to rateApp,
- but instead of jumping to the review directly, an intermediary prompt is displayed.
- */
-+ (void)forceShowPrompt:(BOOL)displayRateLaterButton;
++ (void)showPrompt;
 
 /*!
  Tells Appirater to open the App Store page where the user can specify a
@@ -181,18 +170,6 @@ extern NSString *const kAppiraterReminderRequestDate;
  Tells Appirater to immediately close any open rating modals (e.g. StoreKit rating VCs).
 */
 + (void)closeModal;
-
-/*!
- Asks Appirater if the user has declined to rate;
-*/
-- (BOOL)userHasDeclinedToRate;
-
-/*!
- Asks Appirater if the user has rated the current version.
- Note that this is not a guarantee that the user has actually rated the app in the 
- app store, but they've just clicked the rate button on the Appirater dialog. 
-*/
-- (BOOL)userHasRatedCurrentVersion;
 
 @end
 
@@ -243,31 +220,6 @@ extern NSString *const kAppiraterReminderRequestDate;
 + (void) setTimeBeforeReminding:(double)value;
 
 /*!
- Set customized title for alert view.
- */
-+ (void) setCustomAlertTitle:(NSString *)title;
-
-/*!
- Set customized message for alert view.
- */
-+ (void) setCustomAlertMessage:(NSString *)message;
-
-/*!
- Set customized cancel button title for alert view.
- */
-+ (void) setCustomAlertCancelButtonTitle:(NSString *)cancelTitle;
-
-/*!
- Set customized rate button title for alert view.
- */
-+ (void) setCustomAlertRateButtonTitle:(NSString *)rateTitle;
-
-/*!
- Set customized rate later button title for alert view.
- */
-+ (void) setCustomAlertRateLaterButtonTitle:(NSString *)rateLaterTitle;
-
-/*!
  'YES' will show the Appirater alert everytime. Useful for testing how your message
  looks and making sure the link to your app's review page works.
  */
@@ -284,7 +236,7 @@ extern NSString *const kAppiraterReminderRequestDate;
 + (void)setUsesAnimation:(BOOL)animation;
 
 /*!
- If set to YES, Appirater will open App Store link (instead of SKStoreProductViewController on iOS 6). Default YES.
+ If set to YES, Appirater will open App Store link (instead of SKStoreProductViewController on iOS 6). Default NO.
  */
 + (void)setOpenInAppStore:(BOOL)openInAppStore;
 
@@ -319,13 +271,5 @@ extern NSString *const kAppiraterReminderRequestDate;
  Calls [Appirater appLaunched:YES]. See appLaunched: for details of functionality.
  */
 + (void)appLaunched __attribute__((deprecated)); 
-
-/*!
- DEPRECATED: While still functional, it's better to use
- tryToShowPrompt instead.
- 
- Calls [Appirater tryToShowPrompt]. See tryToShowPrompt for details of functionality.
- */
-+ (void)showPrompt __attribute__((deprecated));
 
 @end
